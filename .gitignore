@@ -3,4 +3,4 @@ __pycache__/
 !*.py
 !*.ipynb
 !*.md
-*.*
+import_controller.rb
