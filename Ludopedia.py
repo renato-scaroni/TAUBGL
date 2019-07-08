@@ -10,6 +10,8 @@ class Ludopedia(HTMLParser):
             "style"
         ])
         self.collection = []
+        self.file = open("log", 'w')
+        self.current_game = None
 
     def reset_game_buffer(self):
         # g['rating'] = collection.rating[game.bgid].userrating
@@ -19,12 +21,17 @@ class Ludopedia(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         self.last_tag.append(tag)
-        print ("open tag", tag)
+        # self.file.write ("open tag:{}\n".format(tag))
+        if tag == "h4":
+            self.current_game = {}
 
     def handle_endtag(self, tag):
-        print ("close tag", tag)
+        # self.file.write ("close tag:{}\n".format(tag))
         if len(self.last_tag) > 0 and self.last_tag[-1] == tag:
             self.last_tag.pop()
+        if tag == "h4":
+            self.collection.append(self.current_game)
+            self.current_game = None
 
     def handle_data(self, data):
         if len(self.last_tag) == 0:
@@ -32,8 +39,16 @@ class Ludopedia(HTMLParser):
         tag = self.last_tag[-1]
         if tag in self.tags_to_ignore:
             return
-        if not data.strip() == "":
-            print("Encountered {} - {}".format(tag, data))
+        data = data.strip()
+        if not data == "" and not self.current_game == None:
+            if tag == "a":
+                self.current_game["title"] = data
+                self.current_game["owned"] = True
+            if tag == "span" and len(self.collection) > 0:
+                self.current_game["rating"] = data
+            if tag == "p" and len(self.collection) > 0:
+                self.current_game["description"] = data
+            # self.file.write("Encountered {} - {}\n".format(tag, data))
 
     @staticmethod
     def fetch_collection_page(user, pg_number=1):
@@ -54,7 +69,14 @@ class Ludopedia(HTMLParser):
         return r.text
 
     def fetch_collection(self, user):
-        self.feed(self.fetch_collection_page(user))
+        last_collection_size = -1
+        page_count = 1
+        while not len(self.collection) == last_collection_size:
+            last_collection_size = len(self.collection)
+            self.feed(self.fetch_collection_page(user, page_count))
+            page_count += 1
 
 parser = Ludopedia()
 parser.fetch_collection('scaroni')
+for g in parser.collection:
+    print(g['title'])
