@@ -1,8 +1,3 @@
-#%% [markdown]
-# # Importing data from BGG
-
-#%%
-# routines to retrieve aditional bg information
 from urllib.error import  URLError
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import ParseError as ETParseError
