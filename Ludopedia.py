@@ -13,20 +13,12 @@ class Ludopedia(HTMLParser):
         self.file = open("log", 'w')
         self.current_game = None
 
-    def reset_game_buffer(self):
-        # g['rating'] = collection.rating[game.bgid].userrating
-        # g['name'] = game.name
-        # g['owned'] = bool(int(collection.status[game.name].own))
-        self.game_buffer = {}
-
     def handle_starttag(self, tag, attrs):
         self.last_tag.append(tag)
-        # self.file.write ("open tag:{}\n".format(tag))
         if tag == "h4":
             self.current_game = {}
 
     def handle_endtag(self, tag):
-        # self.file.write ("close tag:{}\n".format(tag))
         if len(self.last_tag) > 0 and self.last_tag[-1] == tag:
             self.last_tag.pop()
         if tag == "h4":
@@ -48,7 +40,6 @@ class Ludopedia(HTMLParser):
                 self.current_game["rating"] = data
             if tag == "p" and len(self.collection) > 0:
                 self.current_game["description"] = data
-            # self.file.write("Encountered {} - {}\n".format(tag, data))
 
     @staticmethod
     def fetch_collection_page(user, pg_number=1):
