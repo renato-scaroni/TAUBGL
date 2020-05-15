@@ -1,6 +1,4 @@
-__pycache__/
-.ipynb_checkpoints/
+*
 !*.py
 !*.ipynb
 !*.md
-import_controller.rb
