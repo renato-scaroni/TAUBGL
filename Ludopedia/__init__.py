@@ -1,0 +1,2 @@
+from .CollectionParser import LudopediaCollectionParser as CollectionParser
+from .ListsParser import LudopediaPublicListsParser as ListsParser
