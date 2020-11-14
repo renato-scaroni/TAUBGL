@@ -22,9 +22,9 @@ def get_collection_line(x):
 
     return line
 
-def handle_collections(collection_name):
+def handle_collections(collection_name, game_type):
     parser = Ludopedia.CollectionParser()
-    parser.fetch_collection(collection_name, tipo='colecao', tipo_jogo='base')
+    parser.fetch_collection(collection_name, tipo='colecao', tipo_jogo=game_type)
 
     collection = list(map(get_collection_line, parser.collection))
 
@@ -44,12 +44,12 @@ parser.add_argument("--collection", default=None, type=str)
 parser.add_argument("--no_title", action='store_true')
 parser.add_argument("-r", "--rating", action='store_true')
 parser.add_argument("-d","--description", action='store_true')
-
+parser.add_argument("-t", "--type", default="base", type=str)
 
 parser.add_argument("--list_url", default=None, type=str)
 
 args = parser.parse_args()
 if args.collection is not None:
-    handle_collections(args.collection)
+    handle_collections(args.collection, args.type)
 if args.list_url is not None:
     handle_list(args.list_url)
