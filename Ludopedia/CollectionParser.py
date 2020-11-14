@@ -1,10 +1,15 @@
 from html.parser import HTMLParser
 import requests
 
+class TagInfo:
+    def __init__(self, name, attrs):
+        self.name = name
+        self.attrs = dict(attrs)
+
 class LudopediaCollectionParser(HTMLParser):
     def __init__(self):
         HTMLParser.__init__(self)
-        self.last_tag = []
+        self.visited_tags = []
         self.tags_to_ignore = set([
             "script",
             "style"
@@ -14,29 +19,31 @@ class LudopediaCollectionParser(HTMLParser):
         self.current_game = None
 
     def handle_starttag(self, tag, attrs):
-        # print("open tag", tag)
-        self.last_tag.append(tag)
+        # print("open tag", tag, attrs)
+        self.visited_tags.append(TagInfo(tag, attrs))
         if tag == "h4":
             self.current_game = {}
 
     def handle_endtag(self, tag):
         # print("close tag", tag)
-        if len(self.last_tag) > 0 and self.last_tag[-1] == tag:
-            self.last_tag.pop()
+        if len(self.visited_tags) > 0 and self.visited_tags[-1].name == tag:
+            self.visited_tags.pop()
         if tag == "p" and self.current_game is not None:
             self.collection.append(self.current_game)
             self.current_game = None
 
     def handle_data(self, data):
-        if len(self.last_tag) == 0:
+        if len(self.visited_tags) == 0:
             return
-        tag = self.last_tag[-1]
+        last_tag = self.visited_tags[-1]
+        tag = last_tag.name
         if tag in self.tags_to_ignore:
             return
         data = data.strip()
         # print(tag, data, self.current_game == None)
         if not data == "" and not self.current_game == None:
             if tag == "a":
+                self.current_game["link"] = last_tag.attrs["href"]
                 self.current_game["title"] = data
                 self.current_game["owned"] = True
             if tag == "span" and len(self.collection) > 0:

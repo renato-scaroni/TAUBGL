@@ -19,6 +19,8 @@ def get_collection_line(x):
         line.append(x['rating'] if 'rating' in x else "-")
     if args.description:
         line.append(x['description'] if 'description' in x else "-")
+    if args.link:
+        line.append(x['link'] if 'link' in x else "-")
 
     return line
 
@@ -35,6 +37,8 @@ def handle_collections(collection_name, game_type):
         headers.append("rating")
     if args.description:
         headers.append("description")
+    if args.link:
+        headers.append("link")
 
     print(tabulate(collection, headers=headers))
 
@@ -44,6 +48,7 @@ parser.add_argument("--collection", default=None, type=str)
 parser.add_argument("--no_title", action='store_true')
 parser.add_argument("-r", "--rating", action='store_true')
 parser.add_argument("-d","--description", action='store_true')
+parser.add_argument("-l","--link", action='store_true')
 parser.add_argument("-t", "--type", default="base", type=str)
 
 parser.add_argument("--list_url", default=None, type=str)
